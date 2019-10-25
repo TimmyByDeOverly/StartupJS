@@ -4,7 +4,7 @@ import TodoItem from 'components/TodoItem'
 import './index.styl'
 import { observer, useQuery } from 'startupjs'
 
-export default observer(function TodoScope () {
+export default observer(function InputBox () {
 
   const [todos, $todos] = useQuery('todos', {})
   if(!todos) return null
@@ -15,20 +15,20 @@ export default observer(function TodoScope () {
   const [unCompletedCount = 0] = useQuery('todos', {$count : true, completed : false})
 
   const addTodo = () => {
-      const date = new Date()
       $todos.add({
         text : input,
         completed : false,
-        date : date.getDay() +
-          "/" + (date.getMonth() + 1) +
-          "/" + date.getFullYear()
+        createdAt : Date.now()
       })
     setInput('')
   }
 
   const onEdit = (id, text) => $todos.at(id).setEach('text', text)
   const onDelete = (id) => $todos.at(id).del()
-  const onCompleted = (id) => $todos.at(id).set('completed', true)
+  const onToggleCompleted = (id) => {
+    const flag = $todos.at(id).set('completed', true)
+    $todos.at(id).set('completed', !flag)
+  }
 
   return pug`
     View.container
@@ -50,10 +50,10 @@ export default observer(function TodoScope () {
           each item in todos
             TodoItem(
               key=item.id
-              data=item.text
-              todosDate=item.date
+              title=item.text
+              createdAt=item.createdAt
               onCompletFlag=item.completed
-              onCompleted=() => onCompleted(item.id)
+              onToggleCompleted=() => onToggleCompleted(item.id)
               onEdit=() => onEdit()
               onDelete=() => onDelete(item.id)
             )

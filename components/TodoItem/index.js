@@ -6,7 +6,7 @@ import { observer } from 'startupjs'
 export default observer(function TodoItem(props) {
 
   const [editFlag, setEditFlag] = useState(false)
-  const [input, setInput] = useState('')
+  const [input, setInput] = useState(props.input)
 
   const toggleEdit = () => setEditFlag(ok => !ok)
 
@@ -16,29 +16,37 @@ export default observer(function TodoItem(props) {
           Button(
               title='C'
               color='green'
-              onPress=props.onCompleted
+              onPress=props.onToggleCompleted
+          )
+          View.redButton
+          Button(
+              color='red'
+              title='D'
+              onPress=props.onDelete
+          )
+          View.yellowButton
+          Button(
+              color='#FFCE00'
+              title='E'
+              onPress=toggleEdit
           )
       View
         if editFlag
-          TextInput(
+          if props.onCompletFlag
+            Text.todoCompleted Completed!
+          else  
+          TextInput.textInput(
           value=input
-          onSubmitEditing=() => props.onEdit(props.data.id, input)
+          onSubmitEditing=() => props.onEdit(props.title.id, input)
           onChangeText=input => setInput(input)
           onPress=() => toggleEdit()
         )
         else
           View
             if props.onCompletFlag
-              Text.todoCompleted
-                #{props.data}
+              Text.todoCompleted Completed!
             else
               Text.unfulfilledTodo
-                #{props.data} 
-      View.redButton
-          Button(
-              color='red'
-              title='DEL'
-              onPress=props.onDelete
-          )  
+                ${props.title}
 `
 })
