@@ -1,10 +1,10 @@
 import React, { useState } from 'react'
-import { View, Text, TextInput, TouchableOpacity, ScrollView } from 'react-native'
+import { View, Text, TextInput, TouchableOpacity, ScrollView, FlatList } from 'react-native'
 import TodoItem from 'components/TodoItem'
 import './index.styl'
 import { observer, useQuery } from 'startupjs'
 
-export default observer(function InputBox () {
+export default observer(function Todos () {
 
   const [todos, $todos] = useQuery('todos', {})
   if(!todos) return null
@@ -15,19 +15,33 @@ export default observer(function InputBox () {
   const [unCompletedCount = 0] = useQuery('todos', {$count : true, completed : false})
 
   const addTodo = () => {
-      $todos.add({
-        text : input,
-        completed : false,
-        createdAt : Date.now()
-      })
+    $todos.add({
+      text : input,
+      completed : false,
+      createdAt : Date.now()
+    })
     setInput('')
   }
 
   const onEdit = (id, text) => $todos.at(id).setEach('text', text)
   const onDelete = (id) => $todos.at(id).del()
   const onToggleCompleted = (id) => {
-    const flag = $todos.at(id).set('completed', true)
+    const flag = $todos.at(id).get('completed')
     $todos.at(id).set('completed', !flag)
+  }
+
+  const renderItem = (data) => {
+    let { item } = data
+    return pug`
+      TodoItem(
+        key=item.id
+        title=item.text
+        onCompletFlag=item.completed
+        onToggleCompleted=() => onToggleCompleted(item.id)
+        onEdit=() => onEdit()
+        onDelete=() => onDelete(item.id)
+      )
+    `
   }
 
   return pug`
@@ -44,20 +58,13 @@ export default observer(function InputBox () {
         TouchableOpacity.inputButton(
           onPress=() => addTodo()
         )
-          Text.inputButtonText ADD            
+          Text.inputButtonText ADD
       View
-        ScrollView
-          each item in todos
-            TodoItem(
-              key=item.id
-              title=item.text
-              createdAt=item.createdAt
-              onCompletFlag=item.completed
-              onToggleCompleted=() => onToggleCompleted(item.id)
-              onEdit=() => onEdit()
-              onDelete=() => onDelete(item.id)
-            )
+        FlatList(
+          data=todos
+          renderItem=(item) => renderItem(item)
+        )
       View
-        Text Completed: #{completedCount} / Text Items count: #{unCompletedCount}       
+        Text Completed: #{completedCount} / Text Items count: #{unCompletedCount}
 `
 })

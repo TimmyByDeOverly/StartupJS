@@ -12,41 +12,38 @@ export default observer(function TodoItem(props) {
 
   return pug`
   View.container
-      View.greenButton
+      View.completButton
           Button(
-              title='C'
+              title='Com'
               color='green'
               onPress=props.onToggleCompleted
           )
-          View.redButton
-          Button(
-              color='red'
-              title='D'
-              onPress=props.onDelete
+          View
+            Button(
+                color='red'
+                title='Del'
+                onPress=props.onDelete
           )
-          View.yellowButton
-          Button(
-              color='#FFCE00'
-              title='E'
-              onPress=toggleEdit
+          View
+            Button(
+                color='#FFCE00'
+                title='Edit'
+                onPress=toggleEdit
           )
       View
         if editFlag
-          if props.onCompletFlag
-            Text.todoCompleted Completed!
-          else  
-          TextInput.textInput(
-          value=input
-          onSubmitEditing=() => props.onEdit(props.title.id, input)
-          onChangeText=input => setInput(input)
-          onPress=() => toggleEdit()
-        )
+            TextInput.textInput(
+            value=input
+            onSubmitEditing=() => props.onEdit(props.title.id, input)
+            onChangeText=input => setInput(input)
+            )
+            if props.onCompletFlag
+                Text.flagCompleted Completed!
         else
           View
-            if props.onCompletFlag
-              Text.todoCompleted Completed!
-            else
-              Text.unfulfilledTodo
+            Text.unfulfilledTodo
                 ${props.title}
+            if props.onCompletFlag
+                Text.flagCompleted Completed!
 `
 })
