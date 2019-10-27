@@ -30,8 +30,8 @@ export default observer(function Todos () {
     $todos.at(id).set('completed', !flag)
   }
 
-  const renderItem = (data) => {
-    let { item } = data
+  const renderItem = ({ item }) => {
+    //const { item } = data
     return pug`
       TodoItem(
         key=item.id
